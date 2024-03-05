@@ -119,6 +119,11 @@ Editor.initialize = function()
 		// Arguments
 		Editor.args = [];
 
+		window.addEventListener('message', (event) => {
+			console.log('got message from parent', event.data);
+			//
+		  });
+
 		var parameters = Nunu.getQueryParameters();
 		for (var i in parameters)
 		{
@@ -224,11 +229,11 @@ Editor.initialize = function()
 			{
 				if (Editor.openFile === null)
 				{
-					Editor.gui.saveProgram();
+					Editor.gui.saveProgram(undefined, false);
 				}
 				else
 				{
-					Editor.saveProgram(undefined, true);
+					Editor.saveProgram(undefined, false);
 				}
 			}
 			else if (key === Keyboard.L)
@@ -1014,6 +1019,8 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 
 			var pson = new StaticPair();
 			var data = pson.toArrayBuffer(Editor.program.toJSON());
+			const message = { type: 'scenedata', data: Editor.program.toJSON() };
+			window.parent.postMessage(message, '*');
 			FileSystem.writeFileArrayBuffer(fname, data);
 		}
 		else
@@ -1021,6 +1028,8 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 			fname = fname.replace(".nsp", ".isp");
 
 			var json = JSON.stringify(Editor.program.toJSON(), null, "\t");
+			const message = { type: 'scenedata', data: Editor.program.toJSON() };
+			window.parent.postMessage(message, '*');
 			FileSystem.writeFile(fname, json);
 		}
 

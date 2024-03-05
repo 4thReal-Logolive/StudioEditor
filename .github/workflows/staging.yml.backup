@@ -1,0 +1,55 @@
+name: staging
+on:
+  push:
+    branches: [ staging ]
+  pull_request:
+    branches: [ staging ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+    contents: read
+    pages: write
+    id-token: write
+
+concurrency: 
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+    # Build job
+    build:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+
+        - name: Setup Pages
+          uses: actions/configure-pages@v4
+
+        - name: Setup Node.js
+          uses: actions/setup-node@v1
+          with:
+            node-version: 16.13.0
+
+        - name: Cache Node Modules
+          id: cache-node-modules
+          uses: actions/cache@v2
+          with:
+            path: node_modules
+            key: node-modules-${{ hashFiles('package-lock.json') }}
+        
+        - name: Install Dependencies
+          if: steps.cache.outputs.cache-hit != 'true'
+          run: npm install --legacy-peer-deps
+
+        - name: Build
+          run: npm run build
+
+        - name: Deploy to GH Pages 🚀
+          uses: peaceiris/actions-gh-pages@v3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            publish_dir: public

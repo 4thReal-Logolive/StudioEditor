@@ -76,18 +76,18 @@ function MainMenu(parent)
 	{
 		if (Editor.openFile !== null)
 		{
-			Editor.saveProgram(undefined, true);
+			Editor.saveProgram(undefined, false);
 		}
 		else
 		{
-			Editor.gui.saveProgram();
+			Editor.gui.saveProgram(undefined, false);
 		}
 	}, Global.FILE_PATH + "icons/misc/save.png");
 
 	// Save project
 	fileMenu.addOption(Locale.saveAs, function()
 	{
-		Editor.gui.saveProgram();
+		Editor.gui.saveProgram(undefined, false);
 	}, Global.FILE_PATH + "icons/misc/save.png").setAltText("CTRL+S");
 
 	// Save project to folder

@@ -74,14 +74,14 @@ Interface.prototype.saveProgram = function()
 	{
 		FileSystem.chooseFile(function(files)
 		{
-			Editor.saveProgram(files[0].path, true);
+			Editor.saveProgram(files[0].path, false);
 		}, ".nsp", true);
 	}
 	else
 	{
 		FileSystem.chooseFileName(function(fname)
 		{
-			Editor.saveProgram(fname, true);
+			Editor.saveProgram(fname, false);
 		}, ".nsp", Editor.openFile !== null ? Editor.openFile : "file");
 	}
 };
