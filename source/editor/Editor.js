@@ -119,10 +119,25 @@ Editor.initialize = function()
 		// Arguments
 		Editor.args = [];
 
+		//add logoLive event handlers here
 		window.addEventListener('message', (event) => {
 			console.log('got message from parent', event.data);
-			//
-		  });
+			switch (event.data.type) {
+				case "loading": //load a project from Firebase storage
+						console.log('SceneEditor is loading data: ', event.data);
+						try {
+							Editor.loadProgram(event.data.data, false);
+						}
+						catch (e) {
+							Editor.alert(Locale.errorLoadingFile + "\n(" + e + ")");
+							console.error("nunuStudio: Error loading file", e);
+						}
+					break;
+				default:
+					console.log('A message was received, but no event handler matched the message type: ', event.data);
+					break;
+			}
+		});
 
 		var parameters = Nunu.getQueryParameters();
 		for (var i in parameters)
@@ -1020,7 +1035,7 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 			var pson = new StaticPair();
 			var data = pson.toArrayBuffer(Editor.program.toJSON());
 			const message = { type: 'scenedata', data: Editor.program.toJSON() };
-			window.parent.postMessage(message, '*');
+			window.parent.postMessage(message, '*'); //post to logoLive
 			FileSystem.writeFileArrayBuffer(fname, data);
 		}
 		else
@@ -1029,7 +1044,7 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 
 			var json = JSON.stringify(Editor.program.toJSON(), null, "\t");
 			const message = { type: 'scenedata', data: Editor.program.toJSON() };
-			window.parent.postMessage(message, '*');
+			window.parent.postMessage(message, '*'); //post to logoLive
 			FileSystem.writeFile(fname, json);
 		}
 
@@ -1162,6 +1177,11 @@ Editor.loadProgram = function(file, binary)
 		{
 			reader.result = FileSystem.readFile(file);
 		}
+		onload();
+	}
+	else if(typeof file === "object") { //in this case, we're loading a JSON directly from parent window
+		var reader = {};
+		reader.result = JSON.stringify(file);
 		onload();
 	}
 };
