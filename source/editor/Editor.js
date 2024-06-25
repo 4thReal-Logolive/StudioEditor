@@ -126,7 +126,7 @@ Editor.initialize = function()
 				case "loading": //load a project from Firebase storage
 						console.log('SceneEditor is loading data: ', event.data);
 						try {
-							Editor.loadProgram(event.data.data, false);
+							Editor.loadProgram(event.data.projectJSON, false);
 						}
 						catch (e) {
 							Editor.alert(Locale.errorLoadingFile + "\n(" + e + ")");
@@ -1037,6 +1037,7 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 			const message = { type: 'scenedata', data: Editor.program.toJSON() };
 			window.parent.postMessage(message, '*'); //post to logoLive
 			FileSystem.writeFileArrayBuffer(fname, data);
+			console.log("POSTING!!!!", Editor.program.toJSON());
 		}
 		else
 		{
@@ -1046,6 +1047,7 @@ Editor.saveProgram = function(fname, binary, keepDirectory, suppressMessage)
 			const message = { type: 'scenedata', data: Editor.program.toJSON() };
 			window.parent.postMessage(message, '*'); //post to logoLive
 			FileSystem.writeFile(fname, json);
+			console.log("POSTING!!!!", Editor.program.toJSON());
 		}
 
 		if (keepDirectory !== true && Editor.openFile !== fname)
